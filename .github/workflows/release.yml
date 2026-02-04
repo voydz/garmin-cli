@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build-and-bump-tap:
+    runs-on: macos-14  # Apple Silicon runner
+    env:
+      HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup project
+        run: |
+          uv python install 3.13
+          uv sync --extra dev
+
+      - name: Build binary
+        run: |
+          uv run pyinstaller \
+            --onefile \
+            --name gc \
+            --target-arch arm64 \
+            --add-data "src/garmincli/commands:garmincli/commands" \
+            --collect-all garminconnect \
+            --hidden-import garth \
+            src/garmincli/__main__.py
+
+      - name: Smoke test binary
+        run: |
+          ./dist/gc --help
+
+      - name: Package tarball
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          TAR="gc-${VERSION}-macos-arm64.tar.gz"
+          tar -czf "$TAR" -C dist gc
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "TAR=$TAR" >> "$GITHUB_ENV"
+
+      - name: Compute sha256
+        run: |
+          SHA256=$(shasum -a 256 "$TAR" | awk '{print $1}')
+          echo "SHA256=$SHA256" >> "$GITHUB_ENV"
+
+      - name: Upload release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" "$TAR" --clobber
+
+      - name: Bump tap formula
+        run: |
+          URL="https://github.com/voydz/garmincli/releases/download/${GITHUB_REF_NAME}/${TAR}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          brew tap voydz/homebrew-tap
+          brew bump-formula-pr gc \
+            --url "$URL" \
+            --sha256 "$SHA256"

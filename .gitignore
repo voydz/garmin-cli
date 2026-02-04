@@ -1,0 +1,32 @@
+# Agentic Dev specific
+IMPLEMENTATION_PLAN.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
+.venv/
+
+# PyInstaller
+*.spec
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tokens (sensitive)
+.gc-tokens/
+
+# uv
+.python-version
