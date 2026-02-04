@@ -16,13 +16,13 @@ lint-fix:
 	uv run ruff format src/
 
 build:
-	uv run pyinstaller 
-		--onefile 
-		--name gc 
-		--target-arch arm64 
-		--add-data "src/garmincli/commands:garmincli/commands" 
-		--collect-all garminconnect 
-		--hidden-import garth 
+	uv run pyinstaller \
+		--onefile \
+		--name gc \
+		--target-arch arm64 \
+		--add-data "src/garmincli/commands:garmincli/commands" \
+		--collect-all garminconnect \
+		--hidden-import garth \
 		src/garmincli/__main__.py
 
 package: build
