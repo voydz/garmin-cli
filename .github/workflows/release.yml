@@ -24,22 +24,13 @@ jobs:
       - name: Setup project
         run: |
           uv python install 3.13
-          uv sync --extra dev
+          make setup
 
       - name: Build binary
-        run: |
-          uv run pyinstaller \
-            --onefile \
-            --name gc \
-            --target-arch arm64 \
-            --add-data "src/garmincli/commands:garmincli/commands" \
-            --collect-all garminconnect \
-            --hidden-import garth \
-            src/garmincli/__main__.py
+        run: make build
 
       - name: Smoke test binary
-        run: |
-          ./dist/gc --help
+        run: make smoke
 
       - name: Package tarball
         run: |

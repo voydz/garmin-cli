@@ -1,6 +1,6 @@
-"""Entry point for garmincli."""
+"""Entry point for Garmin CLI."""
 
-from .cli import app
+from garmincli.cli import app
 
 if __name__ == "__main__":
     app()

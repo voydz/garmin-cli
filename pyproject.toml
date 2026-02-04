@@ -1,5 +1,5 @@
 [project]
-name = "garmincli"
+name = "garmin-cli"
 version = "0.1.0"
 description = "CLI to read health data from Garmin Connect"
 readme = "README.md"

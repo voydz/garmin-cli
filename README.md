@@ -1,4 +1,7 @@
-# garmincli (`gc`)
+# Garmin CLI (`gc`)
+
+[![Release](https://img.shields.io/github/v/release/voydz/garmin-cli)](https://github.com/voydz/garmin-cli/releases)
+[![Homebrew Tap](https://img.shields.io/badge/homebrew-voydz%2Fhomebrew--tap-blue?logo=homebrew)](https://github.com/voydz/homebrew-tap)
 
 A fully non-interactive CLI to read health data from Garmin Connect.
 
@@ -11,8 +14,8 @@ brew install voydz/tap/gc
 Or install from source with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-git clone https://github.com/voydz/garmincli.git
-cd garmincli
+git clone https://github.com/voydz/garmin-cli.git
+cd garmin-cli
 uv sync
 uv run gc --help
 ```
@@ -42,7 +45,7 @@ gc status --profile
 gc logout
 ```
 
-Tokens are stored in `~/.garmincli/tokens/` by default. Override with `--tokenstore PATH` or the `GARMINTOKENS` environment variable.
+Tokens are stored in `~/.garmin-cli/tokens/` by default. Override with `--tokenstore PATH` or the `GARMINTOKENS` environment variable.
 
 ## Usage
 
@@ -237,7 +240,7 @@ gc menstrual pregnancy
 Build a standalone macOS ARM64 binary:
 
 ```bash
-./scripts/build.sh
+make package
 ```
 
 The binary will be at `dist/gc`.

@@ -18,7 +18,7 @@ def get_token_dir(tokenstore: Optional[str] = None) -> Path:
     1. Explicit --tokenstore argument
     2. GARMINTOKENS environment variable
     3. If running as PyInstaller binary: .gc-tokens/ relative to binary
-    4. Fallback: ~/.garmincli/tokens/
+    4. Fallback: ~/.garmin-cli/tokens/
     """
     if tokenstore:
         return Path(tokenstore).expanduser().resolve()
@@ -30,7 +30,7 @@ def get_token_dir(tokenstore: Optional[str] = None) -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).parent / ".gc-tokens"
 
-    return Path.home() / ".garmincli" / "tokens"
+    return Path.home() / ".garmin-cli" / "tokens"
 
 
 def login(

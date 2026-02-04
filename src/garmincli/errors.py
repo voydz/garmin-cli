@@ -1,8 +1,8 @@
-"""Custom exceptions for garmincli."""
+"""Custom exceptions for Garmin CLI."""
 
 
 class GarminCliError(Exception):
-    """Base exception for garmincli."""
+    """Base exception for Garmin CLI."""
 
 
 class AuthenticationError(GarminCliError):
