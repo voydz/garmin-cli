@@ -53,10 +53,10 @@ jobs:
 
       - name: Bump tap formula
         run: |
-          URL="https://github.com/voydz/garmincli/releases/download/${GITHUB_REF_NAME}/${TAR}"
+          URL="https://github.com/voydz/garmin-cli/releases/download/${GITHUB_REF_NAME}/${TAR}"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           brew tap voydz/homebrew-tap
-          brew bump-formula-pr voydz/tap/gc \
+          brew bump-formula-pr voydz/tap/garmin-cli \
             --url "$URL" \
             --sha256 "$SHA256"

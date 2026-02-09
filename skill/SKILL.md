@@ -13,7 +13,7 @@ This skill provides read access to Garmin Connect health and fitness data throug
 1.  **Install via Homebrew tap:**
     ```bash
     brew tap voydz/homebrew-tap
-    brew install gc
+    brew install garmin-cli
     ```
 
 2.  **Authentication:**

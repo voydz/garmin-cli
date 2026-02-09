@@ -8,7 +8,7 @@ A fully non-interactive CLI to read health data from Garmin Connect.
 ## Installation
 
 ```bash
-brew install voydz/tap/gc
+brew install voydz/tap/garmin-cli
 ```
 
 Or install from source with [uv](https://docs.astral.sh/uv/):
