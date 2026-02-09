@@ -35,7 +35,7 @@ jobs:
       - name: Package tarball
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          TAR="gc-${VERSION}-macos-arm64.tar.gz"
+          TAR="garmin-cli-${VERSION}-macos.tar.gz"
           tar -czf "$TAR" -C dist gc
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "TAR=$TAR" >> "$GITHUB_ENV"

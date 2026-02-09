@@ -37,8 +37,8 @@ package: build
 	VERSION=$$(grep '^version' pyproject.toml | head -1 | cut -d'"' -f2); 
 	echo "Packaging gc v$$VERSION..."; 
 	cd dist && 
-	tar -czf "gc-$$VERSION-macos-arm64.tar.gz" gc && 
-	shasum -a 256 "gc-$$VERSION-macos-arm64.tar.gz"
+	tar -czf "garmin-cli-$$VERSION-macos.tar.gz" gc && 
+	shasum -a 256 "garmin-cli-$$VERSION-macos.tar.gz"
 
 smoke: build
 	@set -e; \
