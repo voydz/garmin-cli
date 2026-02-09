@@ -1,6 +1,6 @@
 """Garmin API wrapper with error handling."""
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from garminconnect import (
     GarminConnectAuthenticationError,

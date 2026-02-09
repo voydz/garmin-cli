@@ -26,4 +26,8 @@ dev = [
     "pyinstaller>=6.0.0",
     "ruff>=0.4.0",
     "mypy>=1.10.0",
+    "pytest>=8.0.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

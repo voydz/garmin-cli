@@ -15,7 +15,9 @@ challenges_app = typer.Typer(no_args_is_help=True)
 
 
 def records(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -32,9 +34,13 @@ def records(
 @goals_app.callback(invoke_without_command=True)
 def goals_cmd(
     ctx: typer.Context,
-    status: str = typer.Option("active", "--status", "-s", help="Goal status (active/future/past)."),
+    status: str = typer.Option(
+        "active", "--status", "-s", help="Goal status (active/future/past)."
+    ),
     limit: int = typer.Option(30, "--limit", "-l", help="Number of goals."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -52,7 +58,9 @@ def goals_cmd(
 
 @badges_app.command()
 def earned(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -68,7 +76,9 @@ def earned(
 
 @badges_app.command()
 def available(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -84,7 +94,9 @@ def available(
 
 @badges_app.command("in-progress")
 def in_progress(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -102,7 +114,9 @@ def in_progress(
 def adhoc(
     start_offset: int = typer.Option(0, "--start", help="Starting offset."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of challenges."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -120,7 +134,9 @@ def adhoc(
 def badge(
     start_offset: int = typer.Option(0, "--start", help="Starting offset."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of challenges."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -138,7 +154,9 @@ def badge(
 def challenges_available(
     start_offset: int = typer.Option(0, "--start", help="Starting offset."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of challenges."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -156,7 +174,9 @@ def challenges_available(
 def non_completed(
     start_offset: int = typer.Option(0, "--start", help="Starting offset."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of challenges."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -174,7 +194,9 @@ def non_completed(
 def virtual(
     start_offset: int = typer.Option(0, "--start", help="Starting offset."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of challenges."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

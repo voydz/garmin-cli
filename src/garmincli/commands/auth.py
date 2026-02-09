@@ -14,15 +14,29 @@ from ..output import print_error, print_success, render
 
 
 def login(
-    email: str = typer.Option(..., "--email", "-e", help="Garmin Connect email.", envvar="GARMIN_EMAIL"),
-    password: str = typer.Option(..., "--password", "-p", help="Garmin Connect password.", envvar="GARMIN_PASSWORD"),
+    email: str = typer.Option(
+        ..., "--email", "-e", help="Garmin Connect email.", envvar="GARMIN_EMAIL"
+    ),
+    password: str = typer.Option(
+        ...,
+        "--password",
+        "-p",
+        help="Garmin Connect password.",
+        envvar="GARMIN_PASSWORD",
+    ),
     mfa: Optional[str] = typer.Option(None, "--mfa", help="MFA code."),
-    wait_mfa: bool = typer.Option(False, "--wait-mfa", help="Wait for MFA code from stdin."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    wait_mfa: bool = typer.Option(
+        False, "--wait-mfa", help="Wait for MFA code from stdin."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
 ) -> None:
     """Log in to Garmin Connect."""
     try:
-        client = _login(email, password, mfa_code=mfa, wait_mfa=wait_mfa, tokenstore=tokenstore)
+        client = _login(
+            email, password, mfa_code=mfa, wait_mfa=wait_mfa, tokenstore=tokenstore
+        )
         name = client.get_full_name() or client.display_name or "User"
         print_success(f"Logged in as {name}.")
     except GarminCliError as e:
@@ -31,7 +45,9 @@ def login(
 
 
 def logout(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
 ) -> None:
     """Log out and remove saved tokens."""
     _logout(tokenstore=tokenstore)
@@ -40,8 +56,12 @@ def logout(
 
 def status(
     profile: bool = typer.Option(False, "--profile", help="Show full profile."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
-    fmt: str = typer.Option("table", "--format", "-f", help="Output format (table/json)."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
+    fmt: str = typer.Option(
+        "table", "--format", "-f", help="Output format (table/json)."
+    ),
 ) -> None:
     """Show login status and optionally user profile."""
     try:

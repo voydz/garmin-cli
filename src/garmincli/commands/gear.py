@@ -15,8 +15,12 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 @app.callback(invoke_without_command=True)
 def gear_cmd(
     ctx: typer.Context,
-    user_profile_number: Optional[str] = typer.Argument(None, help="User profile number."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    user_profile_number: Optional[str] = typer.Argument(
+        None, help="User profile number."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -24,7 +28,9 @@ def gear_cmd(
     if ctx.invoked_subcommand is not None:
         return
     if not user_profile_number:
-        print_error("User profile number is required. Find it via 'gc status --profile'.")
+        print_error(
+            "User profile number is required. Find it via 'gc status --profile'."
+        )
         raise typer.Exit(1)
     try:
         client = load_client(tokenstore=tokenstore)
@@ -38,7 +44,9 @@ def gear_cmd(
 @app.command()
 def defaults(
     user_profile_number: str = typer.Argument(..., help="User profile number."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -55,7 +63,9 @@ def defaults(
 @app.command()
 def stats(
     gear_uuid: str = typer.Argument(..., help="Gear UUID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -73,7 +83,9 @@ def stats(
 def gear_activities(
     gear_uuid: str = typer.Argument(..., help="Gear UUID."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of activities."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

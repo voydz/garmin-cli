@@ -15,9 +15,13 @@ app = typer.Typer(no_args_is_help=True)
 
 @app.command()
 def vo2max(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -34,9 +38,13 @@ def vo2max(
 
 @app.command()
 def hrv(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -53,9 +61,13 @@ def hrv(
 
 @app.command("training-readiness")
 def training_readiness(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -72,9 +84,13 @@ def training_readiness(
 
 @app.command("morning-readiness")
 def morning_readiness(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -91,9 +107,13 @@ def morning_readiness(
 
 @app.command("training-status")
 def training_status(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -110,9 +130,13 @@ def training_status(
 
 @app.command("fitness-age")
 def fitness_age(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -129,11 +153,17 @@ def fitness_age(
 
 @app.command("race-predictions")
 def race_predictions(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
-    prediction_type: Optional[str] = typer.Option(None, "--type", "-t", help="Type (daily/monthly)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    prediction_type: Optional[str] = typer.Option(
+        None, "--type", "-t", help="Type (daily/monthly)."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -152,10 +182,14 @@ def race_predictions(
 
 @app.command("endurance-score")
 def endurance_score(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     end: Optional[str] = typer.Option(None, "--end", help="End date for range."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -172,10 +206,14 @@ def endurance_score(
 
 @app.command("hill-score")
 def hill_score(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     end: Optional[str] = typer.Option(None, "--end", help="End date for range."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -195,8 +233,15 @@ def lactate_threshold(
     latest: bool = typer.Option(True, "--latest/--no-latest", help="Get latest data."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
-    aggregation: str = typer.Option("daily", "--aggregation", "-a", help="Aggregation (daily/weekly/monthly/yearly)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    aggregation: str = typer.Option(
+        "daily",
+        "--aggregation",
+        "-a",
+        help="Aggregation (daily/weekly/monthly/yearly).",
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -221,7 +266,9 @@ def lactate_threshold(
 
 @app.command("cycling-ftp")
 def cycling_ftp(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

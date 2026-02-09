@@ -12,9 +12,13 @@ from ..output import print_error, render
 
 
 def sleep_cmd(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

@@ -221,6 +221,10 @@ gc workouts
 gc workouts get WORKOUT_ID
 gc workouts download WORKOUT_ID -o workout.fit
 gc workouts scheduled WORKOUT_ID
+gc workouts create --file workout.json
+gc workouts create --name "Zone 2 Grundlage" --sport cycling --steps '[{"type":"warmup","duration":600},{"type":"interval","duration":3600,"target":"hr_zone:2"},{"type":"cooldown","duration":300}]'
+gc workouts update WORKOUT_ID --file workout.json
+gc workouts delete WORKOUT_ID
 
 gc training-plans
 gc training-plans get PLAN_ID

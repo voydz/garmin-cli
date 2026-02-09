@@ -12,11 +12,15 @@ from ..output import print_error, render
 
 
 def health(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -32,13 +36,17 @@ def health(
 
 
 def steps(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
     weekly: bool = typer.Option(False, "--weekly", help="Show weekly stats."),
     weeks: int = typer.Option(4, "--weeks", help="Number of weeks for weekly stats."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -52,7 +60,12 @@ def steps(
             render(data, fmt=fmt, title="Weekly Steps", output=output)
         elif end_date:
             data = api_call(client.get_daily_steps, cdate, end_date)
-            render(data, fmt=fmt, title=f"Daily Steps ({cdate} to {end_date})", output=output)
+            render(
+                data,
+                fmt=fmt,
+                title=f"Daily Steps ({cdate} to {end_date})",
+                output=output,
+            )
         else:
             data = api_call(client.get_steps_data, cdate)
             render(data, fmt=fmt, title=f"Steps ({cdate})", output=output)
@@ -62,9 +75,13 @@ def steps(
 
 
 def floors(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -80,13 +97,17 @@ def floors(
 
 
 def intensity(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     weekly: bool = typer.Option(False, "--weekly", help="Show weekly stats."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
     weeks: int = typer.Option(4, "--weeks", help="Number of weeks for weekly stats."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -107,9 +128,13 @@ def intensity(
 
 
 def events(
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

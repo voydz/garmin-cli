@@ -1,7 +1,6 @@
 """Output formatting for JSON and Rich tables."""
 
 import json
-import sys
 from typing import Any, Optional
 
 from rich.console import Console

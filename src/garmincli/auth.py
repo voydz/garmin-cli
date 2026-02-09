@@ -74,17 +74,13 @@ def load_client(tokenstore: Optional[str] = None) -> Garmin:
     token_dir = get_token_dir(tokenstore)
 
     if not token_dir.exists():
-        raise AuthenticationError(
-            "Not logged in. Run 'gc login' first."
-        )
+        raise AuthenticationError("Not logged in. Run 'gc login' first.")
 
     client = Garmin()
     try:
         client.login(tokenstore=str(token_dir))
     except FileNotFoundError:
-        raise AuthenticationError(
-            "Token files not found. Run 'gc login' first."
-        )
+        raise AuthenticationError("Token files not found. Run 'gc login' first.")
     except Exception as e:
         raise AuthenticationError(f"Failed to load session: {e}") from e
 

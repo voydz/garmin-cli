@@ -1,6 +1,5 @@
 """Activities commands."""
 
-from pathlib import Path
 from typing import Optional
 
 import typer
@@ -27,14 +26,20 @@ ACTIVITY_LIST_COLUMNS = [
 @app.callback(invoke_without_command=True)
 def activities_cmd(
     ctx: typer.Context,
-    date_shortcut: Optional[str] = typer.Argument(None, help="Date shortcut or YYYY-MM-DD."),
+    date_shortcut: Optional[str] = typer.Argument(
+        None, help="Date shortcut or YYYY-MM-DD."
+    ),
     date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of activities."),
     offset: int = typer.Option(0, "--offset", help="Starting offset."),
-    activity_type: Optional[str] = typer.Option(None, "--type", "-t", help="Activity type filter."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    activity_type: Optional[str] = typer.Option(
+        None, "--type", "-t", help="Activity type filter."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -60,7 +65,9 @@ def activities_cmd(
 
 @app.command()
 def last(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -77,7 +84,9 @@ def last(
 @app.command()
 def get(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -93,7 +102,9 @@ def get(
 
 @app.command()
 def count(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
 ) -> None:
     """Show total activity count."""
@@ -112,7 +123,9 @@ def count(
 @app.command()
 def details(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -129,7 +142,9 @@ def details(
 @app.command()
 def splits(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -146,7 +161,9 @@ def splits(
 @app.command("typed-splits")
 def typed_splits(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -163,7 +180,9 @@ def typed_splits(
 @app.command("split-summaries")
 def split_summaries(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -180,7 +199,9 @@ def split_summaries(
 @app.command()
 def weather(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -197,7 +218,9 @@ def weather(
 @app.command("hr-zones")
 def hr_zones(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -214,7 +237,9 @@ def hr_zones(
 @app.command("power-zones")
 def power_zones(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -231,7 +256,9 @@ def power_zones(
 @app.command("exercise-sets")
 def exercise_sets(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -247,7 +274,9 @@ def exercise_sets(
 
 @app.command("types")
 def activity_types(
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -264,9 +293,15 @@ def activity_types(
 @app.command()
 def download(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    dl_format: str = typer.Option("fit", "--format", "-f", help="Download format (fit/tcx/gpx/kml/csv)."),
-    output_file: Optional[str] = typer.Option(None, "--output", "-o", help="Output file path."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    dl_format: str = typer.Option(
+        "fit", "--format", "-f", help="Download format (fit/tcx/gpx/kml/csv)."
+    ),
+    output_file: Optional[str] = typer.Option(
+        None, "--output", "-o", help="Output file path."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
 ) -> None:
     """Download an activity file."""
     from garminconnect import Garmin as GarminAPI
@@ -301,7 +336,9 @@ def download(
 @app.command()
 def upload(
     file: str = typer.Argument(..., help="Activity file to upload (.fit, .gpx, .tcx)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
 ) -> None:
     """Upload an activity file."""
@@ -320,8 +357,12 @@ def upload(
 def progress(
     start: str = typer.Option(..., "--start", help="Start date (YYYY-MM-DD)."),
     end: str = typer.Option(..., "--end", help="End date (YYYY-MM-DD)."),
-    metric: str = typer.Option("distance", "--metric", "-m", help="Metric (distance/duration/elevation)."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    metric: str = typer.Option(
+        "distance", "--metric", "-m", help="Metric (distance/duration/elevation)."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:
@@ -344,7 +385,9 @@ def progress(
 @app.command("gear")
 def activity_gear(
     activity_id: str = typer.Argument(..., help="Activity ID."),
-    tokenstore: Optional[str] = typer.Option(None, "--tokenstore", help="Token storage path."),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
     fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
 ) -> None:

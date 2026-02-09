@@ -40,7 +40,12 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
-        None, "--version", "-v", help="Show version.", callback=version_callback, is_eager=True
+        None,
+        "--version",
+        "-v",
+        help="Show version.",
+        callback=version_callback,
+        is_eager=True,
     ),
 ) -> None:
     """Garmin Connect CLI."""
@@ -86,6 +91,8 @@ app.add_typer(goals.challenges_app, name="challenges", help="Challenges.")
 app.add_typer(gear.app, name="gear", help="Gear management.")
 
 app.add_typer(workouts.app, name="workouts", help="Workouts.")
-app.add_typer(workouts.training_plans_app, name="training-plans", help="Training plans.")
+app.add_typer(
+    workouts.training_plans_app, name="training-plans", help="Training plans."
+)
 
 app.add_typer(menstrual.app, name="menstrual", help="Menstrual cycle data.")

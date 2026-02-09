@@ -1,5 +1,7 @@
 .PHONY: setup run build clean lint lint-fix package smoke
 
+.DEFAULT_GOAL := check
+
 setup:
 	uv venv
 	uv sync --extra dev
@@ -14,6 +16,11 @@ lint:
 lint-fix:
 	uv run ruff check --fix src/
 	uv run ruff format src/
+
+test:
+	uv run pytest
+
+check: lint test
 
 build:
 	uv run pyinstaller \
