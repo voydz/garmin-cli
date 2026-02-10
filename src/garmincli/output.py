@@ -6,8 +6,16 @@ from typing import Any, Optional
 from rich.console import Console
 from rich.table import Table
 
-console = Console()
-err_console = Console(stderr=True)
+_CONSOLE_KWARGS = {
+    "color_system": None,
+    "no_color": True,
+    "highlight": False,
+    "emoji": False,
+    "width": 200,
+}
+
+console = Console(**_CONSOLE_KWARGS)
+err_console = Console(stderr=True, **_CONSOLE_KWARGS)
 
 
 def print_json(data: Any, output: Optional[str] = None) -> None:
@@ -51,9 +59,9 @@ def _print_dict_table(
     data: dict, title: Optional[str] = None, output: Optional[str] = None
 ) -> None:
     """Print a dict as a two-column key-value table."""
-    table = Table(title=title, show_header=True)
-    table.add_column("Field", style="cyan", no_wrap=True)
-    table.add_column("Value", style="white")
+    table = _new_table(title=title, show_header=True)
+    table.add_column("Field", no_wrap=True)
+    table.add_column("Value")
     for key, value in data.items():
         if isinstance(value, (dict, list)):
             value = json.dumps(value, default=str)
@@ -71,9 +79,9 @@ def _print_list_table(
     if not columns:
         columns = list(data[0].keys())
 
-    table = Table(title=title, show_header=True)
+    table = _new_table(title=title, show_header=True)
     for col in columns:
-        table.add_column(col, style="white", no_wrap=False)
+        table.add_column(col, no_wrap=False)
 
     for row in data:
         values = []
@@ -91,10 +99,22 @@ def _output_table(table: Table, output: Optional[str] = None) -> None:
     """Output table to console or file."""
     if output:
         with open(output, "w") as f:
-            file_console = Console(file=f, width=200)
+            file_console = Console(file=f, **_CONSOLE_KWARGS)
             file_console.print(table)
     else:
         console.print(table)
+
+
+def _new_table(title: Optional[str], show_header: bool) -> Table:
+    return Table(
+        title=title,
+        show_header=show_header,
+        box=None,
+        show_edge=False,
+        pad_edge=False,
+        collapse_padding=True,
+        expand=False,
+    )
 
 
 def render(
