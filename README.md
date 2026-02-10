@@ -45,7 +45,7 @@ gc status --profile
 gc logout
 ```
 
-Tokens are stored in `~/.garmin-cli/tokens/` by default. Override with `--tokenstore PATH` or the `GARMINTOKENS` environment variable.
+Tokens are stored in `~/.config/garmin-cli/tokens/` by default. Override with `--tokenstore PATH` or the `GARMINTOKENS` environment variable.
 
 ## Usage
 
