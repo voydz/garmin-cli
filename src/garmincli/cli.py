@@ -7,6 +7,7 @@ import typer
 from . import __version__
 from .commands import (
     activities,
+    api,
     auth,
     body,
     devices,
@@ -96,3 +97,4 @@ app.add_typer(
 )
 
 app.add_typer(menstrual.app, name="menstrual", help="Menstrual cycle data.")
+app.add_typer(api.app, name="api", help="Raw Garmin Connect API calls.")

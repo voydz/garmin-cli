@@ -167,7 +167,6 @@ gc workouts get WORKOUT_ID
 gc workouts download WORKOUT_ID [-o FILE]
 gc workouts scheduled WORKOUT_ID
 gc workouts create --file workout.json
-gc workouts create --name "Zone 2 Grundlage" --sport cycling --steps '[{"type":"warmup","duration":600},{"type":"interval","duration":3600,"target":"hr_zone:2"},{"type":"cooldown","duration":300}]'
 gc workouts update WORKOUT_ID --file workout.json
 gc workouts delete WORKOUT_ID
 gc training-plans
@@ -218,6 +217,71 @@ gc metrics hrv today --format json
 gc sleep yesterday --format json
 gc battery yesterday --format json
 ```
+
+## Workout creation (concise)
+- Prefer `--file` with a Garmin-shaped JSON payload; the CLI does not infer or transform fields.
+- Get a valid payload by exporting an existing workout:
+  ```bash
+  gc workouts get WORKOUT_ID --format json > workout.json
+  ```
+- If using flags, provide `--sport-id` explicitly and pass `--steps` as the exact `workoutSteps` JSON array from the API.
+
+Garmin workout shape (minimal example):
+```json
+{
+  "workoutName": "Zone 2 Ride",
+  "sportType": {
+    "sportTypeKey": "cycling",
+    "sportTypeId": 17
+  },
+  "workoutSegments": [
+    {
+      "segmentOrder": 1,
+      "sportType": {
+        "sportTypeKey": "cycling",
+        "sportTypeId": 17
+      },
+      "workoutSteps": [
+        {
+          "stepOrder": 1,
+          "stepType": { "stepTypeKey": "warmup" },
+          "endCondition": { "conditionTypeKey": "time" },
+          "endConditionValue": 600
+        },
+        {
+          "stepOrder": 2,
+          "stepType": { "stepTypeKey": "interval" },
+          "endCondition": { "conditionTypeKey": "time" },
+          "endConditionValue": 3600
+        }
+      ]
+    }
+  ]
+}
+```
+
+Example creations:
+```bash
+# Create from file (recommended)
+gc workouts create --file workout.json
+
+# Create with flags using exact Garmin steps JSON
+gc workouts create \
+  --name "Zone 2 Ride" \
+  --sport cycling \
+  --sport-id 17 \
+  --steps '[{"stepOrder":1,"stepType":{"stepTypeKey":"warmup"},"endCondition":{"conditionTypeKey":"time"},"endConditionValue":600},{"stepOrder":2,"stepType":{"stepTypeKey":"interval"},"endCondition":{"conditionTypeKey":"time"},"endConditionValue":3600}]'
+```
+
+How to discover format and valid values for workout creation:
+- Sport type keys/ids (used in `sportType`):
+  - `gc activities types --format json`
+- Workout step/target enums are not hardcoded in the CLI.
+  - Export an existing workout and reuse the exact values:
+    ```bash
+    gc workouts get WORKOUT_ID --format json
+    ```
+  - Use the returned `stepType`, `endCondition`, and `targetType` fields verbatim.
 
 **List devices and get solar data:**
 ```bash

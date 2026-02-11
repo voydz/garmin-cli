@@ -222,7 +222,6 @@ gc workouts get WORKOUT_ID
 gc workouts download WORKOUT_ID -o workout.fit
 gc workouts scheduled WORKOUT_ID
 gc workouts create --file workout.json
-gc workouts create --name "Zone 2 Grundlage" --sport cycling --steps '[{"type":"warmup","duration":600},{"type":"interval","duration":3600,"target":"hr_zone:2"},{"type":"cooldown","duration":300}]'
 gc workouts update WORKOUT_ID --file workout.json
 gc workouts delete WORKOUT_ID
 
@@ -230,6 +229,17 @@ gc training-plans
 gc training-plans get PLAN_ID
 gc training-plans adaptive PLAN_ID
 ```
+
+Workout creation notes:
+- Prefer `--file` with a Garmin-shaped payload. The CLI does not infer or transform fields.
+- Get a valid payload shape from Garmin, then edit it:
+  - `gc workouts get WORKOUT_ID --format json > workout.json`
+  - Update fields you want to change (e.g., `workoutName`, `sportType`, `workoutSegments`).
+- To discover sport type ids/keys, use:
+  - `gc activities types --format json`
+- If you use flags instead of `--file`, you must provide an explicit `--sport-id`, and
+  `--steps` must be a JSON array of `workoutSteps` objects exactly as returned by the API.
+  (Tip: copy `workoutSegments[].workoutSteps` from `gc workouts get ...`.)
 
 ### Menstrual Cycle
 

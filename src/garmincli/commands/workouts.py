@@ -14,63 +14,6 @@ from ..output import print_error, print_success, render
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 training_plans_app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 
-STEP_TYPE_IDS = {
-    "warmup": 1,
-    "cooldown": 2,
-    "interval": 3,
-}
-
-TARGET_TYPE_IDS = {
-    "no.target": 1,
-    "heart.rate.zone": 4,
-}
-
-
-def _extract_sport_info(item: dict[str, Any]) -> tuple[Optional[str], Optional[int]]:
-    sport = item.get("sportType")
-    if isinstance(sport, dict):
-        return sport.get("sportTypeKey"), sport.get("sportTypeId")
-
-    key = item.get("sportTypeKey") or item.get("typeKey") or item.get("key")
-    sport_id = item.get("sportTypeId") or item.get("typeId") or item.get("id")
-    if not key:
-        name = item.get("typeName") or item.get("name")
-        if isinstance(name, str):
-            key = name.lower()
-    return key, sport_id
-
-
-def _iter_type_items(data: Any) -> list[dict[str, Any]]:
-    if isinstance(data, list):
-        return [item for item in data if isinstance(item, dict)]
-    if isinstance(data, dict):
-        for key in ("workoutTypes", "activityTypes", "types", "items"):
-            value = data.get(key)
-            if isinstance(value, list):
-                return [item for item in value if isinstance(item, dict)]
-        values = [value for value in data.values() if isinstance(value, dict)]
-        if values:
-            return values
-    return []
-
-
-def _resolve_sport_id(client: Any, sport_key: str) -> Optional[int]:
-    for getter_name in ("get_workout_types", "get_activity_types"):
-        getter = getattr(client, getter_name, None)
-        if getter is None:
-            continue
-        try:
-            data = api_call(getter)
-        except GarminCliError:
-            continue
-        for item in _iter_type_items(data):
-            key, sport_id = _extract_sport_info(item)
-            if not key or sport_id is None:
-                continue
-            if key.lower() == sport_key.lower():
-                return sport_id
-    return None
-
 
 def _parse_steps(steps_raw: str) -> list[dict[str, Any]]:
     try:
@@ -80,83 +23,15 @@ def _parse_steps(steps_raw: str) -> list[dict[str, Any]]:
     if not isinstance(steps, list) or not steps:
         raise GarminCliError("Steps must be a non-empty JSON array.")
 
-    first = steps[0]
-    if isinstance(first, dict) and (
-        "stepType" in first or "stepTypeKey" in first or "endCondition" in first
-    ):
-        normalized: list[dict[str, Any]] = []
-        for idx, step in enumerate(steps, start=1):
-            if not isinstance(step, dict):
-                raise GarminCliError("Each step must be a JSON object.")
-            entry = dict(step)
-            entry.setdefault("stepOrder", idx)
-            normalized.append(entry)
-        return normalized
-
-    normalized_steps: list[dict[str, Any]] = []
-    for idx, step in enumerate(steps, start=1):
+    normalized: list[dict[str, Any]] = []
+    for step in steps:
         if not isinstance(step, dict):
             raise GarminCliError("Each step must be a JSON object.")
-        step_type_key = step.get("type")
-        duration = step.get("duration")
-        if not step_type_key or duration is None:
-            raise GarminCliError("Each step requires 'type' and 'duration' fields.")
-
-        step_type = {"stepTypeKey": step_type_key}
-        step_type_id = STEP_TYPE_IDS.get(str(step_type_key).lower())
-        if step_type_id is not None:
-            step_type["stepTypeId"] = step_type_id
-
-        end_condition = {"conditionTypeKey": "time", "conditionTypeId": 2}
-
-        target = step.get("target")
-        target_key = "no.target"
-        zone_number: Optional[int] = None
-        if target:
-            target_text = str(target)
-            if target_text.startswith("hr_zone:"):
-                target_key = "heart.rate.zone"
-                try:
-                    zone_number = int(target_text.split(":", 1)[1])
-                except ValueError as exc:
-                    raise GarminCliError(
-                        f"Invalid hr_zone target: {target_text}"
-                    ) from exc
-            elif target_text in ("none", "no.target"):
-                target_key = "no.target"
-            else:
-                raise GarminCliError(f"Unsupported target format: {target_text}")
-
-        target_type = {
-            "workoutTargetTypeKey": target_key,
-            "workoutTargetTypeId": TARGET_TYPE_IDS.get(target_key),
-        }
-        if target_type["workoutTargetTypeId"] is None:
-            target_type.pop("workoutTargetTypeId")
-
-        try:
-            end_value = float(duration)
-        except (TypeError, ValueError) as exc:
-            raise GarminCliError(
-                f"Invalid duration for step {idx}: {duration}"
-            ) from exc
-
-        entry = {
-            "stepOrder": idx,
-            "stepType": step_type,
-            "endCondition": end_condition,
-            "endConditionValue": end_value,
-            "targetType": target_type,
-        }
-        if zone_number is not None:
-            entry["zoneNumber"] = zone_number
-        normalized_steps.append(entry)
-
-    return normalized_steps
+        normalized.append(step)
+    return normalized
 
 
 def _build_workout_payload(
-    client: Any,
     name: Optional[str],
     sport_key: Optional[str],
     sport_id: Optional[int],
@@ -166,20 +41,19 @@ def _build_workout_payload(
     if file_path:
         try:
             with open(file_path, "r") as handle:
-                return json.load(handle)
+                payload = json.load(handle)
         except json.JSONDecodeError as exc:
             raise GarminCliError(f"Invalid workout JSON file: {exc}") from exc
+        if not isinstance(payload, dict):
+            raise GarminCliError("Workout JSON file must contain an object.")
+        return payload
 
-    if not name or not sport_key or not steps_raw:
-        raise GarminCliError("Provide --file or --name, --sport, and --steps.")
-
-    resolved_id = sport_id or _resolve_sport_id(client, sport_key)
-    if resolved_id is None:
+    if not name or not sport_key or sport_id is None or not steps_raw:
         raise GarminCliError(
-            f"Unable to resolve sport id for '{sport_key}'. Use --sport-id or --file."
+            "Provide --file or --name, --sport, --sport-id, and --steps."
         )
 
-    sport = {"sportTypeKey": sport_key, "sportTypeId": resolved_id}
+    sport = {"sportTypeKey": sport_key, "sportTypeId": sport_id}
     steps = _parse_steps(steps_raw)
 
     return {
@@ -357,7 +231,7 @@ def create(
     """Create a workout."""
     try:
         client = load_client(tokenstore=tokenstore)
-        payload = _build_workout_payload(client, name, sport, sport_id, steps, file)
+        payload = _build_workout_payload(name, sport, sport_id, steps, file)
         data = _workout_request(client, "POST", "/workout-service/workout", payload)
         if data is None:
             print_success("Workout created.")
@@ -387,7 +261,7 @@ def update(
     """Update a workout."""
     try:
         client = load_client(tokenstore=tokenstore)
-        payload = _build_workout_payload(client, name, sport, sport_id, steps, file)
+        payload = _build_workout_payload(name, sport, sport_id, steps, file)
         payload.setdefault("workoutId", workout_id)
         data = _workout_request(
             client, "PUT", f"/workout-service/workout/{workout_id}", payload
