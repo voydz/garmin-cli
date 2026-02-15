@@ -38,6 +38,8 @@ Most commands accept a date shortcut as first argument:
 - `month` — last 30 days (returns a date range)
 - `YYYY-MM-DD` — specific date
 
+For command groups with subcommands (activities, body, stress, heart, menstrual),
+use `--date` on the parent command to avoid argument conflicts.
 Alternatively use `--date`, `--start`/`--end` flags.
 
 ## Output
@@ -70,16 +72,16 @@ gc intensity --weekly --weeks N
 gc events today
 
 # Heart Rate
-gc heart today
-gc heart resting today
+gc heart --date today
+gc heart resting --date today
 
 # Sleep
 gc sleep today
 
 # Stress & Body Battery
-gc stress today
+gc stress --date today
 gc stress --weekly --weeks N
-gc stress all-day today
+gc stress all-day --date today
 gc battery today
 gc battery --start DATE --end DATE
 gc battery --events today
@@ -97,7 +99,7 @@ gc hydration today
 gc activities                                     # List recent (default 20)
 gc activities --limit N --offset N --type TYPE
 gc activities --start DATE --end DATE [--type TYPE]
-gc activities today                               # Activities for a date
+gc activities --date today                        # Activities for a date
 gc activities last                                # Most recent activity
 gc activities get ID                              # Activity summary by ID
 gc activities count                               # Total count
@@ -116,8 +118,8 @@ gc activities download ID --format fit|tcx|gpx|kml|csv [-o FILE]
 gc activities upload FILE                         # .fit, .gpx, .tcx
 
 # Body & Weight
-gc body today [--end DATE]
-gc body weighins today
+gc body --date today [--end DATE]
+gc body weighins --date today
 gc body weighins --start DATE --end DATE
 
 # Advanced Metrics
@@ -156,7 +158,7 @@ gc challenges non-completed [--start N --limit N]
 gc challenges virtual [--start N --limit N]
 
 # Gear
-gc gear USER_PROFILE_NUMBER                       # List gear (profile number from gc status --profile)
+gc gear --user-profile USER_PROFILE_NUMBER        # List gear (profile number from gc status --profile)
 gc gear defaults USER_PROFILE_NUMBER
 gc gear stats GEAR_UUID
 gc gear activities GEAR_UUID [--limit N]
@@ -174,7 +176,7 @@ gc training-plans get PLAN_ID
 gc training-plans adaptive PLAN_ID
 
 # Menstrual Cycle
-gc menstrual today
+gc menstrual --date today
 gc menstrual calendar --start DATE --end DATE
 gc menstrual pregnancy
 ```
@@ -219,12 +221,14 @@ gc battery yesterday --format json
 ```
 
 ## Workout creation (concise)
-- Prefer `--file` with a Garmin-shaped JSON payload; the CLI does not infer or transform fields.
+- Prefer `--file` with a Garmin-shaped JSON payload.
 - Get a valid payload by exporting an existing workout:
   ```bash
   gc workouts get WORKOUT_ID --format json > workout.json
   ```
-- If using flags, provide `--sport-id` explicitly and pass `--steps` as the exact `workoutSteps` JSON array from the API.
+- If using flags, `--steps` can be the exact `workoutSteps` JSON array from the API
+  or a shorthand array with `type`, `duration` (seconds), and optional `target` (e.g. `hr_zone:2`).
+- `--sport-id` is optional when `--sport` is provided; the CLI resolves the id from activity types.
 
 Garmin workout shape (minimal example):
 ```json

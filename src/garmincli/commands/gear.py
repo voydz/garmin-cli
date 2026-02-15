@@ -15,8 +15,8 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 @app.callback(invoke_without_command=True)
 def gear_cmd(
     ctx: typer.Context,
-    user_profile_number: Optional[str] = typer.Argument(
-        None, help="User profile number."
+    user_profile_number: Optional[str] = typer.Option(
+        None, "--user-profile", "-u", help="User profile number."
     ),
     tokenstore: Optional[str] = typer.Option(
         None, "--tokenstore", help="Token storage path."

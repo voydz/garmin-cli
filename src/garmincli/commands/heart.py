@@ -16,10 +16,9 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 @app.callback(invoke_without_command=True)
 def heart(
     ctx: typer.Context,
-    date_shortcut: Optional[str] = typer.Argument(
-        None, help="Date shortcut or YYYY-MM-DD."
+    date: Optional[str] = typer.Option(
+        None, "--date", "-d", help="Date shortcut or YYYY-MM-DD."
     ),
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     tokenstore: Optional[str] = typer.Option(
         None, "--tokenstore", help="Token storage path."
     ),
@@ -31,7 +30,7 @@ def heart(
         return
     try:
         client = load_client(tokenstore=tokenstore)
-        cdate, _ = resolve_date(date_shortcut, date)
+        cdate, _ = resolve_date(date_str=date)
         data = api_call(client.get_heart_rates, cdate)
         render(data, fmt=fmt, title=f"Heart Rate ({cdate})", output=output)
     except GarminCliError as e:

@@ -26,10 +26,9 @@ ACTIVITY_LIST_COLUMNS = [
 @app.callback(invoke_without_command=True)
 def activities_cmd(
     ctx: typer.Context,
-    date_shortcut: Optional[str] = typer.Argument(
-        None, help="Date shortcut or YYYY-MM-DD."
+    date: Optional[str] = typer.Option(
+        None, "--date", "-d", help="Date shortcut or YYYY-MM-DD."
     ),
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     start: Optional[str] = typer.Option(None, "--start", help="Start date."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
     limit: int = typer.Option(20, "--limit", "-l", help="Number of activities."),
@@ -49,8 +48,8 @@ def activities_cmd(
     try:
         client = load_client(tokenstore=tokenstore)
 
-        if date_shortcut or date:
-            cdate, end_date = resolve_date(date_shortcut, date)
+        if date:
+            cdate, end_date = resolve_date(date_str=date)
             data = api_call(client.get_activities_fordate, cdate)
         elif start and end:
             data = api_call(client.get_activities_by_date, start, end, activity_type)

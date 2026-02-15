@@ -84,8 +84,8 @@ gc events yesterday
 ### Heart Rate
 
 ```bash
-gc heart today
-gc heart resting yesterday
+gc heart --date today
+gc heart resting --date yesterday
 ```
 
 ### Sleep
@@ -97,7 +97,7 @@ gc sleep today
 ### Stress & Body Battery
 
 ```bash
-gc stress today
+gc stress --date today
 gc stress --weekly --weeks 4
 gc stress all-day yesterday
 
@@ -122,7 +122,7 @@ gc lifestyle today
 gc activities                              # List recent activities
 gc activities --limit 50 --type running
 gc activities --start 2025-01-01 --end 2025-01-31
-gc activities today
+gc activities --date today
 gc activities last
 gc activities get 12345678
 gc activities count
@@ -147,7 +147,7 @@ gc activities upload myactivity.fit
 ### Body & Weight
 
 ```bash
-gc body today
+gc body --date today
 gc body --end 2025-01-31
 gc body weighins today
 gc body weighins --start 2025-01-01 --end 2025-01-31
@@ -208,7 +208,7 @@ gc challenges virtual
 ### Gear
 
 ```bash
-gc gear USER_PROFILE_NUMBER
+gc gear --user-profile USER_PROFILE_NUMBER
 gc gear defaults USER_PROFILE_NUMBER
 gc gear stats GEAR_UUID
 gc gear activities GEAR_UUID --limit 50
@@ -231,20 +231,21 @@ gc training-plans adaptive PLAN_ID
 ```
 
 Workout creation notes:
-- Prefer `--file` with a Garmin-shaped payload. The CLI does not infer or transform fields.
+- Prefer `--file` with a Garmin-shaped payload.
 - Get a valid payload shape from Garmin, then edit it:
   - `gc workouts get WORKOUT_ID --format json > workout.json`
   - Update fields you want to change (e.g., `workoutName`, `sportType`, `workoutSegments`).
 - To discover sport type ids/keys, use:
   - `gc activities types --format json`
-- If you use flags instead of `--file`, you must provide an explicit `--sport-id`, and
-  `--steps` must be a JSON array of `workoutSteps` objects exactly as returned by the API.
-  (Tip: copy `workoutSegments[].workoutSteps` from `gc workouts get ...`.)
+- If you use flags instead of `--file`, `--steps` can be either:
+  - A JSON array of Garmin `workoutSteps` objects, or
+  - A shorthand array with `type`, `duration` (seconds), and optional `target` (e.g. `hr_zone:2`).
+- `--sport-id` is optional when `--sport` is provided; the CLI resolves the id from activity types.
 
 ### Menstrual Cycle
 
 ```bash
-gc menstrual today
+gc menstrual --date today
 gc menstrual calendar --start 2025-01-01 --end 2025-03-01
 gc menstrual pregnancy
 ```

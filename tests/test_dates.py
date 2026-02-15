@@ -27,6 +27,7 @@ def test_resolve_date_shortcuts(monkeypatch: pytest.MonkeyPatch) -> None:
     assert dates.resolve_date("yesterday") == ("2025-01-14", None)
     assert dates.resolve_date("week") == ("2025-01-08", "2025-01-15")
     assert dates.resolve_date("month") == ("2024-12-16", "2025-01-15")
+    assert dates.resolve_date(date_str="today") == ("2025-01-15", None)
 
 
 def test_resolve_date_range() -> None:

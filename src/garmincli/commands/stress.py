@@ -16,10 +16,9 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 @app.callback(invoke_without_command=True)
 def stress_cmd(
     ctx: typer.Context,
-    date_shortcut: Optional[str] = typer.Argument(
-        None, help="Date shortcut or YYYY-MM-DD."
+    date: Optional[str] = typer.Option(
+        None, "--date", "-d", help="Date shortcut or YYYY-MM-DD."
     ),
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     weekly: bool = typer.Option(False, "--weekly", help="Show weekly stats."),
     weeks: int = typer.Option(4, "--weeks", help="Number of weeks for weekly stats."),
     tokenstore: Optional[str] = typer.Option(
@@ -33,7 +32,7 @@ def stress_cmd(
         return
     try:
         client = load_client(tokenstore=tokenstore)
-        cdate, _ = resolve_date(date_shortcut, date)
+        cdate, _ = resolve_date(date_str=date)
         if weekly:
             data = api_call(client.get_weekly_stress, cdate, weeks)
             render(data, fmt=fmt, title="Weekly Stress", output=output)

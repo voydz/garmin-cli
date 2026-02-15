@@ -53,6 +53,9 @@ def resolve_date(
         return fmt(parse_date(start)), fmt(parse_date(end))
 
     if date_str:
+        if date_str in SHORTCUTS:
+            d, end_d = SHORTCUTS[date_str]()
+            return fmt(d), fmt(end_d) if end_d else None
         return fmt(parse_date(date_str)), None
 
     return fmt(date.today()), None

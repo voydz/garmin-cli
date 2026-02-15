@@ -16,10 +16,9 @@ app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
 @app.callback(invoke_without_command=True)
 def body_cmd(
     ctx: typer.Context,
-    date_shortcut: Optional[str] = typer.Argument(
-        None, help="Date shortcut or YYYY-MM-DD."
+    date: Optional[str] = typer.Option(
+        None, "--date", "-d", help="Date shortcut or YYYY-MM-DD."
     ),
-    date: Optional[str] = typer.Option(None, "--date", "-d", help="Date (YYYY-MM-DD)."),
     end: Optional[str] = typer.Option(None, "--end", help="End date."),
     tokenstore: Optional[str] = typer.Option(
         None, "--tokenstore", help="Token storage path."
@@ -32,7 +31,7 @@ def body_cmd(
         return
     try:
         client = load_client(tokenstore=tokenstore)
-        cdate, end_date = resolve_date(date_shortcut, date, end=end)
+        cdate, end_date = resolve_date(date_str=date, end=end)
         data = api_call(client.get_body_composition, cdate, end_date or cdate)
         render(data, fmt=fmt, title=f"Body Composition ({cdate})", output=output)
     except GarminCliError as e:
