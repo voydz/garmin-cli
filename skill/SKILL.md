@@ -1,12 +1,12 @@
 ---
 name: garmin
-description: Read health, fitness, and activity data from Garmin Connect via a non-interactive CLI.
+description: Access Garmin Connect health, fitness, and activity data via a non-interactive CLI.
 metadata: {"clawdbot":{"emoji":"⌚","requires":{"bins":["gc"]}}}
 ---
 
 # Garmin Connect CLI
 
-This skill provides read access to Garmin Connect health and fitness data through the `gc` CLI.
+This skill provides access to Garmin Connect health and fitness data through the `gc` CLI.
 
 ## Setup
 
@@ -169,16 +169,46 @@ gc workouts get WORKOUT_ID
 gc workouts download WORKOUT_ID [-o FILE]
 gc workouts scheduled WORKOUT_ID
 gc workouts create --file workout.json
+gc workouts create --name "Workout Name" --sport cycling --steps '[{"type":"warmup","duration":600},{"type":"interval","duration":1200,"target":"hr_zone:2"},{"type":"cooldown","duration":600}]'
 gc workouts update WORKOUT_ID --file workout.json
+gc workouts update WORKOUT_ID --name "Workout Name" --sport cycling --steps '[{"type":"warmup","duration":600},{"type":"interval","duration":1200},{"type":"cooldown","duration":600}]'
 gc workouts delete WORKOUT_ID
 gc training-plans
 gc training-plans get PLAN_ID
 gc training-plans adaptive PLAN_ID
 
+## Workouts Steps JSON Schema (`--steps`)
+
+`--steps` expects a JSON array of step objects. Each step can be shorthand or Garmin-shaped.
+
+Shorthand step example:
+```json
+{"type":"interval","duration":1200,"target":"hr_zone:2"}
+```
+
+Supported shorthand fields:
+- `type`: `warmup`, `interval`, `recovery`, `cooldown`, `rest`, `repeat`
+- `duration`: seconds (implies `endCondition` = `time`)
+- `target`: `hr_zone:2`, `power_zone:3`, `pace_zone:4`, `heart_rate:150`, `power:220`, `cadence:90`, `no_target`
+
+Garmin-shaped fields (optional):
+- `stepType`: `{"stepTypeKey":"warmup"}` (or any Garmin stepType object)
+- `stepOrder`: integer
+- `endCondition`: `{"conditionTypeKey":"time|distance|calories|heart_rate|cadence|power|iterations"}`
+- `endConditionValue`: number
+- `targetType`: `{"workoutTargetTypeKey":"no.target|heart.rate|power|speed|cadence|open|heart.rate.zone|power.zone|pace.zone"}`
+- `targetValue`: number
+
+For advanced Garmin payloads (repeat groups, nested steps, etc.), prefer `--file` with the full Garmin schema.
+
 # Menstrual Cycle
 gc menstrual --date today
 gc menstrual calendar --start DATE --end DATE
 gc menstrual pregnancy
+
+# Raw API
+gc api /biometric-service/biometric/latestFunctionalThresholdPower/CYCLING
+gc api --method POST --body '{"foo":"bar"}' /some/endpoint
 ```
 
 ## Examples
@@ -196,6 +226,12 @@ gc steps week --format json
 **Find the user's most recent run:**
 ```bash
 gc activities --limit 5 --type running --format json
+```
+
+**Call a raw Garmin Connect API endpoint:**
+```bash
+gc api /biometric-service/biometric/latestFunctionalThresholdPower/CYCLING
+gc api --method POST --body '{"foo":"bar"}' /some/endpoint
 ```
 
 **Get detailed info about a specific activity:**
