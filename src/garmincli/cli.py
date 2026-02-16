@@ -1,10 +1,7 @@
 """Main Typer application and global options."""
 
-from typing import Optional
-
 import typer
 
-from . import __version__
 from .commands import (
     activities,
     api,
@@ -32,23 +29,8 @@ app = typer.Typer(
 )
 
 
-def version_callback(value: bool) -> None:
-    if value:
-        typer.echo(f"gc {__version__}")
-        raise typer.Exit()
-
-
 @app.callback()
-def main(
-    version: Optional[bool] = typer.Option(
-        None,
-        "--version",
-        "-v",
-        help="Show version.",
-        callback=version_callback,
-        is_eager=True,
-    ),
-) -> None:
+def main() -> None:
     """Garmin Connect CLI."""
 
 

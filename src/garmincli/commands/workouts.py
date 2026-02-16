@@ -31,6 +31,47 @@ TARGET_TYPE_MAP = {
     "none": "no.target",
 }
 
+SPORT_TYPE_DISPLAY_ORDER = {
+    "running": 1,
+    "cycling": 2,
+    "swimming": 3,
+    "walking": 4,
+    "multi_sport": 5,
+    "fitness_equipment": 6,
+    "hiking": 7,
+}
+
+STEP_TYPE_META = {
+    "warmup": {"stepTypeId": 1, "displayOrder": 1},
+    "cooldown": {"stepTypeId": 2, "displayOrder": 2},
+    "interval": {"stepTypeId": 3, "displayOrder": 3},
+    "recovery": {"stepTypeId": 4, "displayOrder": 4},
+    "rest": {"stepTypeId": 5, "displayOrder": 5},
+    "repeat": {"stepTypeId": 6, "displayOrder": 6},
+}
+
+CONDITION_TYPE_META = {
+    "distance": {"conditionTypeId": 1, "displayOrder": 1, "displayable": True},
+    "time": {"conditionTypeId": 2, "displayOrder": 2, "displayable": True},
+    "heart_rate": {"conditionTypeId": 3, "displayOrder": 3, "displayable": True},
+    "calories": {"conditionTypeId": 4, "displayOrder": 4, "displayable": True},
+    "cadence": {"conditionTypeId": 5, "displayOrder": 5, "displayable": True},
+    "power": {"conditionTypeId": 6, "displayOrder": 6, "displayable": True},
+    "iterations": {"conditionTypeId": 7, "displayOrder": 7, "displayable": False},
+}
+
+TARGET_TYPE_META = {
+    "no.target": {"workoutTargetTypeId": 1, "displayOrder": 1},
+    "heart.rate": {"workoutTargetTypeId": 2, "displayOrder": 2},
+    "cadence": {"workoutTargetTypeId": 3, "displayOrder": 3},
+    "speed": {"workoutTargetTypeId": 4, "displayOrder": 4},
+    "power": {"workoutTargetTypeId": 5, "displayOrder": 5},
+    "open": {"workoutTargetTypeId": 6, "displayOrder": 6},
+    "heart.rate.zone": {"workoutTargetTypeId": 2, "displayOrder": 2},
+    "power.zone": {"workoutTargetTypeId": 5, "displayOrder": 5},
+    "pace.zone": {"workoutTargetTypeId": 4, "displayOrder": 4},
+}
+
 
 def _parse_steps(steps_raw: str) -> list[dict[str, Any]]:
     try:
@@ -83,6 +124,43 @@ def _parse_target(target: Any) -> Tuple[str, Optional[float]]:
     return (target_type, parsed_value)
 
 
+def _build_step_type(step_type: dict[str, Any]) -> dict[str, Any]:
+    step_type_key = step_type.get("stepTypeKey")
+    if isinstance(step_type_key, str):
+        step_type_key = step_type_key.lower()
+        step_type["stepTypeKey"] = step_type_key
+        meta = STEP_TYPE_META.get(step_type_key)
+        if meta:
+            step_type.setdefault("stepTypeId", meta["stepTypeId"])
+            step_type.setdefault("displayOrder", meta["displayOrder"])
+    return step_type
+
+
+def _build_end_condition(end_condition: dict[str, Any]) -> dict[str, Any]:
+    condition_key = end_condition.get("conditionTypeKey")
+    if isinstance(condition_key, str):
+        condition_key = condition_key.lower()
+        end_condition["conditionTypeKey"] = condition_key
+        meta = CONDITION_TYPE_META.get(condition_key)
+        if meta:
+            end_condition.setdefault("conditionTypeId", meta["conditionTypeId"])
+            end_condition.setdefault("displayOrder", meta["displayOrder"])
+            end_condition.setdefault("displayable", meta["displayable"])
+    return end_condition
+
+
+def _build_target_type(target_type: dict[str, Any]) -> dict[str, Any]:
+    target_key = target_type.get("workoutTargetTypeKey")
+    if isinstance(target_key, str):
+        target_key = target_key.lower()
+        target_type["workoutTargetTypeKey"] = target_key
+        meta = TARGET_TYPE_META.get(target_key)
+        if meta:
+            target_type.setdefault("workoutTargetTypeId", meta["workoutTargetTypeId"])
+            target_type.setdefault("displayOrder", meta["displayOrder"])
+    return target_type
+
+
 def _normalize_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
     normalized: list[dict[str, Any]] = []
     for idx, step in enumerate(steps, start=1):
@@ -99,10 +177,12 @@ def _normalize_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
             raise GarminCliError(
                 f"Step {idx} missing stepType. Provide stepType or shorthand 'type'."
             )
-        current["stepType"] = step_type
+        current["stepType"] = _build_step_type(step_type)
 
         if "stepOrder" not in current:
             current["stepOrder"] = idx
+
+        current.setdefault("type", "ExecutableStepDTO")
 
         if "duration" in current:
             duration = current.pop("duration")
@@ -114,6 +194,9 @@ def _normalize_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
         end_condition = current.get("endCondition")
         if isinstance(end_condition, str):
             current["endCondition"] = {"conditionTypeKey": end_condition}
+            end_condition = current["endCondition"]
+        if isinstance(end_condition, dict):
+            current["endCondition"] = _build_end_condition(end_condition)
 
         target_type = current.get("targetType")
         if target_type is None and "target" in current:
@@ -126,6 +209,10 @@ def _normalize_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         if "targetType" not in current:
             current["targetType"] = {"workoutTargetTypeKey": "no.target"}
+
+        target_type = current.get("targetType")
+        if isinstance(target_type, dict):
+            current["targetType"] = _build_target_type(target_type)
 
         normalized.append(current)
     return normalized
@@ -142,6 +229,20 @@ def _load_workout_payload(file_path: str) -> dict[str, Any]:
     return payload
 
 
+def _estimate_duration(steps: list[dict[str, Any]]) -> int:
+    total = 0.0
+    for step in steps:
+        end_condition = step.get("endCondition")
+        if not isinstance(end_condition, dict):
+            continue
+        condition_key = end_condition.get("conditionTypeKey")
+        if isinstance(condition_key, str) and condition_key.lower() == "time":
+            value = step.get("endConditionValue")
+            if isinstance(value, (int, float)):
+                total += float(value)
+    return int(round(total))
+
+
 def _build_workout_payload(
     name: Optional[str],
     sport_key: Optional[str],
@@ -155,8 +256,12 @@ def _build_workout_payload(
         )
 
     sport = {"sportTypeKey": sport_key, "sportTypeId": sport_id}
+    display_order = SPORT_TYPE_DISPLAY_ORDER.get(sport_key.lower())
+    if display_order is not None:
+        sport["displayOrder"] = display_order
     return {
         "workoutName": name,
+        "estimatedDurationInSecs": _estimate_duration(steps),
         "sportType": sport,
         "workoutSegments": [
             {
@@ -406,7 +511,10 @@ def create(
             payload = _build_workout_payload(
                 name, sport_key, resolved_id, steps_payload
             )
-        data = _workout_request(client, "POST", "/workout-service/workout", payload)
+        if hasattr(client, "upload_workout"):
+            data = api_call(client.upload_workout, payload)
+        else:
+            data = _workout_request(client, "POST", "/workout-service/workout", payload)
         if data is None:
             print_success("Workout created.")
         else:
