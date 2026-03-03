@@ -123,6 +123,8 @@ gc body weighins --date today
 gc body weighins --start DATE --end DATE
 
 # Advanced Metrics
+gc metrics                                       # Metrics summary
+gc metrics --date today
 gc metrics vo2max today
 gc metrics hrv today
 gc metrics training-readiness today
@@ -136,6 +138,10 @@ gc metrics hill-score today [--end DATE]
 gc metrics lactate-threshold                      # Latest
 gc metrics lactate-threshold --no-latest --start DATE --end DATE --aggregation daily|weekly|monthly|yearly
 gc metrics cycling-ftp
+
+# Note: `gc metrics` summary resolves `vo2max` from daily maxmet first and
+# falls back to `training-status.mostRecentVO2Max` when the selected date has
+# no new maxmet sample.
 
 # Devices
 gc devices                                        # List all devices
@@ -208,6 +214,8 @@ gc menstrual pregnancy
 
 # Raw API
 gc api /biometric-service/biometric/latestFunctionalThresholdPower/CYCLING
+gc api /metrics-service/metrics/maxmet/daily/DATE/DATE
+gc api /metrics-service/metrics/trainingstatus/aggregated/DATE
 gc api --method POST --body '{"foo":"bar"}' /some/endpoint
 ```
 
@@ -231,6 +239,8 @@ gc activities --limit 5 --type running --format json
 **Call a raw Garmin Connect API endpoint:**
 ```bash
 gc api /biometric-service/biometric/latestFunctionalThresholdPower/CYCLING
+gc api /metrics-service/metrics/maxmet/daily/2026-03-03/2026-03-03
+gc api /metrics-service/metrics/trainingstatus/aggregated/2026-03-03
 gc api --method POST --body '{"foo":"bar"}' /some/endpoint
 ```
 

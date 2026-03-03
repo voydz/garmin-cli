@@ -156,6 +156,8 @@ gc body weighins --start 2025-01-01 --end 2025-01-31
 ### Advanced Metrics
 
 ```bash
+gc metrics                    # Latest metrics summary
+gc metrics --date today
 gc metrics vo2max today
 gc metrics hrv today
 gc metrics training-readiness today

@@ -1,6 +1,6 @@
 """Advanced metrics commands."""
 
-from typing import Optional
+from typing import Any, Callable, Optional
 
 import typer
 
@@ -10,7 +10,100 @@ from ..dates import resolve_date
 from ..errors import GarminCliError
 from ..output import print_error, render
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(invoke_without_command=True)
+
+
+def _latest_metric_value(data: Any) -> Any:
+    """Normalize list responses to their latest value for aggregate display."""
+    if isinstance(data, list):
+        if not data:
+            return None
+        return data[-1]
+    return data
+
+
+def _extract_vo2max_from_training_status(data: Any) -> Any:
+    """Get VO2 Max payload from training status response when available."""
+    if not isinstance(data, dict):
+        return None
+    return data.get("mostRecentVO2Max")
+
+
+def _resolve_vo2max_summary(client: Any, cdate: str, training_status: Any) -> Any:
+    """Resolve VO2 Max for summary output with fallback for sparse daily updates."""
+    vo2max = _latest_metric_value(api_call(client.get_max_metrics, cdate))
+    if vo2max is not None:
+        return vo2max
+
+    fallback = _extract_vo2max_from_training_status(training_status)
+    if fallback is not None:
+        return fallback
+    return None
+
+
+def _safe_metric_call(call: Callable[[], Any]) -> Any:
+    """Call a metric endpoint and return an inline error for unsupported metrics."""
+    try:
+        return _latest_metric_value(call())
+    except GarminCliError as e:
+        return {"error": str(e)}
+
+
+@app.callback(invoke_without_command=True)
+def metrics_cmd(
+    ctx: typer.Context,
+    date: Optional[str] = typer.Option(
+        None, "--date", "-d", help="Date shortcut or YYYY-MM-DD."
+    ),
+    tokenstore: Optional[str] = typer.Option(
+        None, "--tokenstore", help="Token storage path."
+    ),
+    fmt: str = typer.Option("table", "--format", "-f", help="Output format."),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file."),
+) -> None:
+    """Show all advanced metrics as a single summary."""
+    if ctx.invoked_subcommand is not None:
+        return
+
+    try:
+        client = load_client(tokenstore=tokenstore)
+        cdate, _ = resolve_date(date_str=date)
+        training_status = _safe_metric_call(
+            lambda: api_call(client.get_training_status, cdate)
+        )
+        data = {
+            "vo2max": _safe_metric_call(
+                lambda: _resolve_vo2max_summary(client, cdate, training_status)
+            ),
+            "hrv": _safe_metric_call(lambda: api_call(client.get_hrv_data, cdate)),
+            "training_readiness": _safe_metric_call(
+                lambda: api_call(client.get_training_readiness, cdate)
+            ),
+            "morning_readiness": _safe_metric_call(
+                lambda: api_call(client.get_morning_training_readiness, cdate)
+            ),
+            "training_status": training_status,
+            "fitness_age": _safe_metric_call(
+                lambda: api_call(client.get_fitnessage_data, cdate)
+            ),
+            "race_predictions": _safe_metric_call(
+                lambda: api_call(client.get_race_predictions)
+            ),
+            "endurance_score": _safe_metric_call(
+                lambda: api_call(client.get_endurance_score, cdate, None)
+            ),
+            "hill_score": _safe_metric_call(
+                lambda: api_call(client.get_hill_score, cdate, None)
+            ),
+            "lactate_threshold": _safe_metric_call(
+                lambda: api_call(client.get_lactate_threshold, latest=True)
+            ),
+            "cycling_ftp": _safe_metric_call(lambda: api_call(client.get_cycling_ftp)),
+        }
+        render(data, fmt=fmt, title=f"Metrics ({cdate})", output=output)
+    except GarminCliError as e:
+        print_error(str(e))
+        raise typer.Exit(1)
 
 
 @app.command()
