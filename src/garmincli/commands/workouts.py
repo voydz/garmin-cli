@@ -20,6 +20,7 @@ TARGET_TYPE_MAP = {
     "heartrate_zone": "heart.rate.zone",
     "heart.rate.zone": "heart.rate.zone",
     "power_zone": "power.zone",
+    "power": "power.zone",
     "power.zone": "power.zone",
     "pace_zone": "pace.zone",
     "pace.zone": "pace.zone",
@@ -68,7 +69,7 @@ TARGET_TYPE_META = {
     "power": {"workoutTargetTypeId": 5, "displayOrder": 5},
     "open": {"workoutTargetTypeId": 6, "displayOrder": 6},
     "heart.rate.zone": {"workoutTargetTypeId": 2, "displayOrder": 2},
-    "power.zone": {"workoutTargetTypeId": 5, "displayOrder": 5},
+    "power.zone": {"workoutTargetTypeId": 2, "displayOrder": 2},
     "pace.zone": {"workoutTargetTypeId": 4, "displayOrder": 4},
 }
 
@@ -89,9 +90,28 @@ def _parse_steps(steps_raw: str) -> list[dict[str, Any]]:
     return normalized
 
 
-def _parse_target(target: Any) -> Tuple[str, Optional[float]]:
+def _parse_target_value(value: str) -> Tuple[Optional[float], Optional[float]]:
+    raw = value.strip().lower()
+    if not raw:
+        return None, None
+    if raw.endswith("w"):
+        raw = raw[:-1]
+    if "-" in raw:
+        low_raw, high_raw = raw.split("-", 1)
+        low_raw = low_raw.strip()
+        high_raw = high_raw.strip()
+        if not low_raw or not high_raw:
+            raise GarminCliError("Target range must be two numbers like '200-220'.")
+        low = float(low_raw) if "." in low_raw else int(low_raw)
+        high = float(high_raw) if "." in high_raw else int(high_raw)
+        return low, high
+    parsed = float(raw) if "." in raw else int(raw)
+    return parsed, None
+
+
+def _parse_target(target: Any) -> Tuple[str, Optional[float], Optional[float]]:
     if isinstance(target, (int, float)):
-        return ("no.target", float(target))
+        return ("no.target", float(target), None)
     if not isinstance(target, str):
         raise GarminCliError(
             "Target must be a string like 'hr_zone:2' or a Garmin targetType object."
@@ -116,12 +136,12 @@ def _parse_target(target: Any) -> Tuple[str, Optional[float]]:
         )
 
     if not value:
-        return (target_type, None)
+        return (target_type, None, None)
     try:
-        parsed_value = float(value) if "." in value else int(value)
+        parsed_value, parsed_value_two = _parse_target_value(value)
     except ValueError as exc:
         raise GarminCliError(f"Target value must be numeric (got '{value}').") from exc
-    return (target_type, parsed_value)
+    return (target_type, parsed_value, parsed_value_two)
 
 
 def _build_step_type(step_type: dict[str, Any]) -> dict[str, Any]:
@@ -200,10 +220,27 @@ def _normalize_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         target_type = current.get("targetType")
         if target_type is None and "target" in current:
-            target_type_key, target_value = _parse_target(current.pop("target"))
+            target_type_key, target_value, target_value_two = _parse_target(
+                current.pop("target")
+            )
             current["targetType"] = {"workoutTargetTypeKey": target_type_key}
             if target_value is not None:
-                current["targetValue"] = target_value
+                if target_type_key == "power.zone":
+                    if target_value_two is None:
+                        target_value_two = target_value
+                    if target_value_two < target_value:
+                        target_value, target_value_two = (
+                            target_value_two,
+                            target_value,
+                        )
+                    current["targetValueOne"] = target_value
+                    current["targetValueTwo"] = target_value_two
+                elif isinstance(target_type_key, str) and target_type_key.endswith(
+                    ".zone"
+                ):
+                    current["zoneNumber"] = int(target_value)
+                else:
+                    current["targetValue"] = target_value
         elif isinstance(target_type, str):
             current["targetType"] = {"workoutTargetTypeKey": target_type}
 
@@ -271,6 +308,54 @@ def _build_workout_payload(
             }
         ],
     }
+
+
+def _merge_workout_payload(
+    client: Any,
+    base: Any,
+    workout_id: str,
+    name: Optional[str],
+    sport_key: Optional[str],
+    sport_id: Optional[int],
+    steps: Optional[list[dict[str, Any]]],
+) -> dict[str, Any]:
+    if not isinstance(base, dict):
+        raise GarminCliError("Workout payload must be a JSON object.")
+
+    payload = dict(base)
+    payload["workoutId"] = workout_id
+
+    if name:
+        payload["workoutName"] = name
+
+    sport_payload = payload.get("sportType")
+    if sport_key or sport_id is not None:
+        resolved_key, resolved_id = _resolve_sport_type(client, sport_key, sport_id)
+        sport_payload = {"sportTypeKey": resolved_key, "sportTypeId": resolved_id}
+        display_order = SPORT_TYPE_DISPLAY_ORDER.get(resolved_key.lower())
+        if display_order is not None:
+            sport_payload["displayOrder"] = display_order
+        payload["sportType"] = sport_payload
+
+    if steps is not None:
+        segments = payload.get("workoutSegments")
+        if segments is None:
+            segments = []
+        if not isinstance(segments, list):
+            raise GarminCliError("Workout segments must be a list.")
+        if len(segments) > 1:
+            raise GarminCliError(
+                "Workout has multiple segments; use --file to update it."
+            )
+        segment = dict(segments[0]) if segments else {}
+        segment.setdefault("segmentOrder", 1)
+        if sport_payload:
+            segment["sportType"] = sport_payload
+        segment["workoutSteps"] = steps
+        payload["workoutSegments"] = [segment]
+        payload["estimatedDurationInSecs"] = _estimate_duration(steps)
+
+    return payload
 
 
 def _iter_activity_type_entries(data: Any) -> list[dict[str, Any]]:
@@ -351,11 +436,26 @@ def _call_connectapi(connectapi: Any, path: str, method: str, payload: Any) -> A
     elif method != "GET":
         raise GarminCliError("Garmin connectapi does not support non-GET methods.")
 
+    accepts_kwargs = any(
+        param.kind == inspect.Parameter.VAR_KEYWORD for param in sig.parameters.values()
+    )
     if payload is not None:
-        if "json" in sig.parameters:
+        if "json" in sig.parameters or accepts_kwargs:
             kwargs["json"] = payload
         elif "data" in sig.parameters:
             kwargs["data"] = payload
+    if method != "GET":
+        if "headers" in sig.parameters or accepts_kwargs:
+            headers = kwargs.get("headers") or {}
+            normalized = {k.upper(): v for k, v in headers.items()}
+            if "NK" not in normalized:
+                headers = dict(headers)
+                headers["NK"] = "NT"
+                normalized["NK"] = "NT"
+            if "ACCEPT" not in normalized:
+                headers = dict(headers)
+                headers["Accept"] = "application/json"
+            kwargs["headers"] = headers
 
     return connectapi(path, **kwargs)
 
@@ -553,11 +653,18 @@ def update(
 
         client = load_client(tokenstore=tokenstore)
         if payload is None:
-            sport_key, resolved_id = _resolve_sport_type(client, sport, sport_id)
-            payload = _build_workout_payload(
-                name, sport_key, resolved_id, steps_payload
+            base_payload = api_call(client.get_workout_by_id, workout_id)
+            payload = _merge_workout_payload(
+                client,
+                base_payload,
+                workout_id,
+                name,
+                sport,
+                sport_id,
+                steps_payload,
             )
-        payload.setdefault("workoutId", workout_id)
+        else:
+            payload.setdefault("workoutId", workout_id)
         data = _workout_request(
             client, "PUT", f"/workout-service/workout/{workout_id}", payload
         )

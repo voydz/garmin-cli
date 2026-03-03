@@ -34,7 +34,7 @@ def test_parse_steps_invalid_root_type() -> None:
 
 def test_parse_steps_invalid_entry() -> None:
     with pytest.raises(GarminCliError):
-        _parse_steps('[1]')
+        _parse_steps("[1]")
 
 
 def test_normalize_steps_shorthand_duration() -> None:
@@ -55,4 +55,13 @@ def test_normalize_steps_target_hr_zone() -> None:
         _parse_steps('[{"type":"interval","duration":300,"target":"hr_zone:2"}]')
     )
     assert steps[0]["targetType"]["workoutTargetTypeKey"] == "heart.rate.zone"
-    assert steps[0]["targetValue"] == 2
+    assert steps[0]["zoneNumber"] == 2
+
+
+def test_normalize_steps_target_power_range() -> None:
+    steps = _normalize_steps(
+        _parse_steps('[{"type":"interval","duration":300,"target":"power:200-220"}]')
+    )
+    assert steps[0]["targetType"]["workoutTargetTypeKey"] == "power.zone"
+    assert steps[0]["targetValueOne"] == 200
+    assert steps[0]["targetValueTwo"] == 220

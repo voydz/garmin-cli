@@ -240,7 +240,14 @@ Workout creation notes:
 - If you use flags instead of `--file`, `--steps` can be either:
   - A JSON array of Garmin `workoutSteps` objects, or
   - A shorthand array with `type`, `duration` (seconds), and optional `target` (e.g. `hr_zone:2`).
+- Power targets in shorthand can be defined as watts:
+  - `power:200` (exact target)
+  - `power:200-220` (target range)
 - `--sport-id` is optional when `--sport` is provided; the CLI resolves the id from activity types.
+Workout update notes:
+- `gc workouts update` with `--steps` fetches the existing workout payload, replaces the first
+  segment's steps, and preserves other fields.
+- Workouts with multiple segments must be updated via `--file`.
 
 ### Menstrual Cycle
 
