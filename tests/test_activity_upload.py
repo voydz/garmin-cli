@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from click import unstyle
 from fit_tool.fit_file import FitFile
 from fit_tool.profile.messages.file_id_message import FileIdMessage
 from requests import Response
@@ -126,9 +127,10 @@ def test_invalid_selection_or_file_never_loads_account_or_uploads(
 def test_help_lists_exact_choices():
     result = runner.invoke(app, ["activities", "upload", "--help"], color=False)
     assert result.exit_code == 0
-    assert "--as-device" in result.stdout
+    text = unstyle(result.stdout)
+    assert "--as-device" in text
     for model in ("edge-530", "edge-840", "forerunner-955"):
-        assert model in result.stdout
+        assert model in text
 
 
 @pytest.mark.parametrize("fmt,extension", [("json", "json"), ("table", "txt")])
