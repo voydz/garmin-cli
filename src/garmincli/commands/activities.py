@@ -1,5 +1,6 @@
 """Activities commands."""
 
+from contextlib import nullcontext
 from typing import Optional
 
 import typer
@@ -8,6 +9,7 @@ from ..api import api_call
 from ..auth import load_client
 from ..dates import resolve_date
 from ..errors import GarminCliError
+from ..fit import DEVICE_PROFILES, DeviceModel, prepare_fit
 from ..output import print_error, print_success, render
 
 app = typer.Typer(no_args_is_help=True, invoke_without_command=True)
@@ -335,6 +337,12 @@ def download(
 @app.command()
 def upload(
     file: str = typer.Argument(..., help="Activity file to upload (.fit, .gpx, .tcx)."),
+    as_device: Optional[DeviceModel] = typer.Option(
+        None,
+        "--as-device",
+        metavar="MODEL",
+        help="Garmin recorder for a temporary FIT copy: " + ", ".join(DEVICE_PROFILES),
+    ),
     tokenstore: Optional[str] = typer.Option(
         None, "--tokenstore", help="Token storage path."
     ),
@@ -342,8 +350,18 @@ def upload(
 ) -> None:
     """Upload an activity file."""
     try:
-        client = load_client(tokenstore=tokenstore)
-        result = api_call(client.upload_activity, file)
+        preparation = (
+            prepare_fit(file, as_device.value) if as_device else nullcontext(file)
+        )
+        with preparation as upload_file:
+            if as_device:
+                profile = DEVICE_PROFILES[as_device.value]
+                typer.echo(
+                    f"Presenting upload copy as Garmin {profile.label} ({as_device.value}).",
+                    err=True,
+                )
+            client = load_client(tokenstore=tokenstore)
+            result = api_call(client.upload_activity, str(upload_file))
         print_success(f"Uploaded {file}")
         if result:
             render(result, fmt=fmt, title="Upload Result")

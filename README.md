@@ -146,7 +146,26 @@ gc activities progress --start 2025-01-01 --end 2025-12-31 --metric distance
 gc activities download 12345678 --format fit -o myrun.zip
 gc activities download 12345678 --format gpx
 gc activities upload myactivity.fit
+
+# Opt-in recorder label for a FIT upload copy
+gc activities upload ride.fit --as-device edge-530 --format json
+gc activities upload ride.fit --as-device edge-840 --format json
+gc activities upload ride.fit --as-device forerunner-955 --format json
 ```
+
+`--as-device` changes only manufacturer/product in the FIT file identity and
+creator device entries (index 0), using a private temporary copy removed after
+upload. The source, sensor identities, serials, firmware, measurements and missing
+HR remain unchanged. Without the flag, FIT/GPX/TCX uploads work as before.
+Malformed, nonactivity or unsupported FIT content is rejected before upload;
+content that `fit-tool` cannot roundtrip losslessly (including compressed
+timestamps and unknown fields in known messages) is unsupported. Representable
+developer fields and unknown messages are retained.
+
+This is an unsupported import workaround: the copy is presented with a Garmin
+recorder label, not evidence that the ride was recorded on that device. It does
+not create physiological inputs or guarantee Garmin Training Effect, Training
+Load, VO2max or other proprietary calculations for any model.
 
 ### Body & Weight
 

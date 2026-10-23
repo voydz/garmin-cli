@@ -48,14 +48,19 @@ build:
 		$(TARGET_ARCH_FLAG) \
 		--add-data "src/garmincli/commands:garmincli/commands" \
 		--collect-all garminconnect \
+		--collect-submodules fit_tool.profile.messages \
+		--copy-metadata fit-tool \
+		--copy-metadata bitstruct \
+		--add-data "THIRD_PARTY_NOTICES.md:." \
 		--hidden-import garth \
 		src/garmincli/__main__.py
 
 package: build
 	@set -e; \
 	echo "Packaging gc v$(VERSION) for $(PLATFORM)-$(ARCH)..."; \
+	cp THIRD_PARTY_NOTICES.md dist/ && \
 	cd dist && \
-	tar -czf "$(TARBALL)" gc && \
+	tar -czf "$(TARBALL)" gc THIRD_PARTY_NOTICES.md && \
 	$(SHA256SUM) "$(TARBALL)"
 
 print-tarball:
@@ -73,6 +78,7 @@ smoke: build
 		VIRTUAL_ENV= CONDA_PREFIX= CONDA_DEFAULT_ENV= PIPENV_ACTIVE= \
 		PYENV_VERSION= UV_PROJECT_ENV= \
 		./dist/gc --help
+	GC_BINARY="$(CURDIR)/dist/gc" uv run pytest tests/test_packaged_fit.py -q
 
 clean:
 	rm -rf dist build __pycache__ src/garmincli/__pycache__

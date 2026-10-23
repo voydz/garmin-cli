@@ -53,6 +53,7 @@ class GarminCli < Formula
 
   def install
     bin.install "gc"
+    doc.install "THIRD_PARTY_NOTICES.md"
   end
 
   test do

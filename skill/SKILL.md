@@ -116,6 +116,7 @@ gc activities gear ID                             # Gear used for activity
 gc activities progress --start DATE --end DATE --metric distance|duration|elevation
 gc activities download ID --format fit|tcx|gpx|kml|csv [-o FILE]
 gc activities upload FILE                         # .fit, .gpx, .tcx
+gc activities upload ride.fit --as-device edge-530 --format json
 
 # Body & Weight
 gc body --date today [--end DATE]
@@ -218,6 +219,16 @@ gc api /metrics-service/metrics/maxmet/daily/DATE/DATE
 gc api /metrics-service/metrics/trainingstatus/aggregated/DATE
 gc api --method POST --body '{"foo":"bar"}' /some/endpoint
 ```
+
+For FIT uploads only, opt in with `--as-device edge-530`, `edge-840` or
+`forerunner-955`. This relabels manufacturer/product in the file identity and
+creator device entries (index 0) in a private temporary upload copy. The original,
+sensors, serials, firmware, measurements and missing HR are preserved; the copy
+is cleaned up after upload. Unsupported or unsafe FITs fail before upload,
+including compressed timestamps and unknown fields that cannot roundtrip.
+Without the flag, existing FIT/GPX/TCX uploads are unchanged. This unsupported
+workaround does not establish actual recording hardware or guarantee Garmin
+Training Effect, Training Load, VO2max or other proprietary metrics.
 
 ## Examples
 
